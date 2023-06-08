@@ -17,12 +17,35 @@
 }
 
 /*************/
+/*   Style   */
+/*************/
+
+body {
+    background: gray;
+}
+
+.container {
+    border : 4px solid rgb(77, 77, 3);
+    padding: 5px;
+    border-radius: 10px;
+    background: rgb(184, 184, 25);
+    position: relative;
+    left: 50%;
+    top: 50px;
+    transform: translate(-50%,0);
+    /* text-align: center; */
+    width: 250px;
+    height: auto;
+}
+
+
+/*************/
 /* Home Page */
 /*************/
 
 #note_list {
     height: auto;
-    width: 200px;
+    width: 100%;
     border: 2px solid black;
     text-align: center;
 }
@@ -40,7 +63,7 @@
 
 .saved_note {
     height: auto;
-    width: 196px;
+    width: 100%;
     border: 2px solid black;
     background: white;
     cursor: pointer;
@@ -54,6 +77,13 @@
     height: auto;
     width: auto;
     border: 2px solid black;
-    color: dimgray;
+    color: rgb(72, 69, 69);
+    background: white;
+    opacity: 80%;
     font-style: italic;
+}
+
+#content {
+    width: 100%;
+    height: 100px;
 }
