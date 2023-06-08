@@ -5,12 +5,12 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
-    <link rel="stylesheet" href="./DP.css">
+    <link rel="stylesheet" href="./style.css">
 </head>
 <body>
     <!-- HOME PAGE -->
     <template id="homePageTemplate">
-        <div>
+        <div class="container">
             <div id="note_list">
                 <div id="note_list_header">
                     <span>My notes</span>
@@ -31,7 +31,7 @@
 
     <!-- NOTE PAGE -->
     <template id="notePageTemplate">
-        <form>
+        <form class="container">
             <!-- Note title -->
             <div>
                 <label for="title">Title: </label>
@@ -73,7 +73,11 @@
         </form>
     </template>
 
-    <script type="module" src="./DP.js"></script>
+    <script src="./stack.js"></script>
+    <script type="module" src="./repositorium.js"></script>
+    <script type="module" src="./noteFactory.js"></script>
+    <script type="module" src="./eventHandlers.js"></script>
+    <script type="module" src="./main.js"></script>
     
 </body>
 </html>
