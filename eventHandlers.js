@@ -1,5 +1,5 @@
 import { simpleNoteFactory } from "./noteFactory.js";
-import { repositorium } from "./repositorium.js";
+import { repository } from "./repository.js";
 import { homePage, notePage } from "./main.js";
 
 ////////////////////////
@@ -8,12 +8,13 @@ import { homePage, notePage } from "./main.js";
 
 export function saveNote (noteName) {
     let titleInput = document.getElementById("title");
+    let contentInput = document.getElementById("content");
     // Checks title validity //
     if (titleInput.value) {
         let availableTitle = true;
         // Checks title availability (for new notes) //
         if (!noteName) {
-            for (let note in repositorium) {
+            for (let note in repository) {
                 if (note === titleInput.value) {
                     availableTitle = false;
                 }
@@ -21,33 +22,30 @@ export function saveNote (noteName) {
         };
         // Saves note //
         if (availableTitle) {
-            // IIFE: Save Note At Repositorium //
+            // IIFE: Save Note At repository //
             (function () {
-                let noteTitle = document.getElementById("title").value;
-                let noteContent = document.getElementById("content").value;
-                // Store At Repositorium //
-                repositorium[noteTitle] = simpleNoteFactory.writeNote(noteTitle,noteContent);
-                repositorium.storeAtRepo(repositorium);
+                let noteTitle = titleInput.value;
+                let noteContent = contentInput.value;
+                // Store At repository //
+                repository[noteTitle] = simpleNoteFactory.writeNote(noteTitle,noteContent);
+                repository.storeAtRepo(repository);
                 // Store at repo list just for new notes //
                 if (!noteName) {
-                    repositorium.storeAtList(noteTitle);
+                    repository.storeAtList(noteTitle);
                 }
             })();
-
-            spanAlert(" Saved","blue");
 
             let creationDate = document.getElementById("creationcreationDate");
             let lastModified = document.getElementById("lastModified");
             let noteTitle = document.getElementById("title").value;
-            creationDate.innerHTML = "Creation date: " + repositorium[noteTitle]["creationDate"];
-            lastModified.innerHTML = "Last modified: " + repositorium[noteTitle]["lastModified"];
+            creationDate.innerHTML = "Creation date: " + repository[noteTitle]["creationDate"];
+            lastModified.innerHTML = "Last modified: " + repository[noteTitle]["lastModified"];
 
             if (!noteName) {
                 notePage(noteTitle);
             }
 
-            spanAlert(" Saved","blue");
-            setTimeout(function () {spanAlert("","blue")},2000);
+            spanAlert(" Saved");
         }
         else {
             spanAlert(" This title has already been asigned to another noteBook","red");
@@ -56,13 +54,20 @@ export function saveNote (noteName) {
     else {
         spanAlert(" Title required","red");
     };
+
+    document.getElementById("title").addEventListener("input",function() {
+        if (document.getElementById("spanAlert").innerText) spanAlert("");
+    })
+    document.getElementById("content").addEventListener("input",function() {
+        if (document.getElementById("spanAlert").innerText) spanAlert("");
+    })
 };
 
 export function deleteNote(noteName) {
-    // Delete From Repositorium //
-    delete repositorium[noteName];
-    repositorium.storeAtRepo(repositorium);
-    repositorium.removeFromList(noteName);
+    // Delete From repository //
+    delete repository[noteName];
+    repository.storeAtRepo(repository);
+    repository.removeFromList(noteName);
     homePage();
 };
 
@@ -72,21 +77,21 @@ export function search () {
     if (value) {
         let filteredList = [];
         let regex = new RegExp(value,"gi");
-        for (let i = 0; i < repositorium["list"].length; i++) {
-            if (repositorium["list"][i].match(regex)) {
-                filteredList.push(repositorium["list"][i]);
+        for (let i = 0; i < repository["list"].length; i++) {
+            if (repository["list"][i].match(regex)) {
+                filteredList.push(repository["list"][i]);
             }
         };
         if (filteredList.length > 0) {
-            repositorium.displayList(filteredList,noteListNode);
+            repository.displayList(filteredList,noteListNode);
         }
         else {
-            repositorium.displayList([],noteListNode,true);
+            repository.displayList([],noteListNode,true);
         }
     }
     else {
         // Display full note list //
-        repositorium.displayList(repositorium["list"],noteListNode);
+        repository.displayList(repository["list"],noteListNode);
     }
 };
 
@@ -112,14 +117,14 @@ export function drag (e) {
             node.onmousemove = null;
             node.onmouseleave = null;
             let jump = (displacement > 0)?Math.ceil(displacement/nodeHeight):Math.floor(displacement/nodeHeight);
-            repositorium.moveListElement(node.innerHTML,jump);
-            repositorium.displayList(repositorium["list"],grandFather);
+            repository.moveListElement(node.innerHTML,jump);
+            repository.displayList(repository["list"],grandFather);
         }
 
         node.onmouseleave = function () {
             node.onmousemove = null;
             node.onmouseup = null;
-            repositorium.displayList(repositorium["list"],grandFather);
+            repository.displayList(repository["list"],grandFather);
         }
 }
 };
@@ -154,8 +159,8 @@ export function searchNoteState (state) {
 ////// Span Alert //////
 ////////////////////////
 
-function spanAlert (message,color) {
+function spanAlert (message,color = "blue") {
     let spanAlert = document.getElementById("spanAlert");
     spanAlert.style.color = color;
-    spanAlert.innerHTML = message;
+    spanAlert.innerText = message;
 };
