@@ -1,4 +1,4 @@
-import { repositorium } from "./repositorium.js";
+import { repository } from "./repository.js";
 import { saveNote, deleteNote, search, drag, preventCtrlZ,searchNoteState } from "./eventHandlers.js";
 
 //////////////////////////////
@@ -6,7 +6,7 @@ import { saveNote, deleteNote, search, drag, preventCtrlZ,searchNoteState } from
 //////////////////////////////
 
 function renderTemplate (templateID) {
-    // Remove current template //
+    // Remove current template //{}
     while (document.body.children[2]) {
         document.body.children[2].remove();
     };
@@ -26,26 +26,31 @@ export function homePage () {
 
     // Display note list //
     let noteListNode = document.getElementById("note_list_container");
-    repositorium.displayList(repositorium["list"],noteListNode);
+    repository.displayList(repository["list"],noteListNode);
     noteListNode.addEventListener("dblclick",function (event) {
         let target = event.target;
         if (target.className === "saved_note") {
             notePage(target.innerHTML)
         }
     });
-    noteListNode.addEventListener("mousedown",function (event) { drag(event) });
+    noteListNode.addEventListener("mousedown",function (event) {
+        let target = event.target;
+        if (target.className === "saved_note") {
+            drag(event)
+        }
+    });
 
     /* Button Events */
     document.getElementById("new_note").addEventListener("click",function () { notePage() });
 
     /* undo/redo */
     document.getElementById("undo").addEventListener("click",function () {
-        repositorium.searchRepoState("previousState");
-        repositorium.displayList(repositorium["list"],noteListNode);
+        repository.searchRepoState("previousState");
+        repository.displayList(repository["list"],noteListNode);
     });
     document.getElementById("redo").addEventListener("click",function () {
-        repositorium.searchRepoState("nextState");
-        repositorium.displayList(repositorium["list"],noteListNode);
+        repository.searchRepoState("nextState");
+        repository.displayList(repository["list"],noteListNode);
     });
 
     /* search input event */
@@ -60,8 +65,8 @@ export function homePage () {
                 search();
             }
             else {
-                repositorium.searchRepoState("previousState");
-                repositorium.displayList(repositorium["list"],noteListNode);
+                repository.searchRepoState("previousState");
+                repository.displayList(repository["list"],noteListNode);
             }
         });
     });
@@ -79,11 +84,11 @@ export function notePage (noteName) {
     renderTemplate("notePageTemplate");
 
     // Fill note information //
-    if (repositorium[noteName]) {
+    if (repository[noteName]) {
         document.getElementById("title").value = noteName;
-        document.getElementById("content").value = repositorium[noteName]["info"];
-        document.getElementById("creationcreationDate").innerHTML = !!repositorium[noteName]?"Creation date: " + repositorium[noteName]["creationDate"]:"";
-        document.getElementById("lastModified").innerHTML = (!!repositorium[noteName])?"Last modified: " + repositorium[noteName]["lastModified"]:"";
+        document.getElementById("content").value = repository[noteName]["info"];
+        document.getElementById("creationcreationDate").innerHTML = !!repository[noteName]?"Creation date: " + repository[noteName]["creationDate"]:"";
+        document.getElementById("lastModified").innerHTML = (!!repository[noteName])?"Last modified: " + repository[noteName]["lastModified"]:"";
     };
 
     /* Button Events */
@@ -106,18 +111,22 @@ export function notePage (noteName) {
     });
     document.getElementById("undoNote").addEventListener("click",function () {
         searchNoteState(noteStack.previousState);
+        noteState[0] = noteStack.currentState[0];
+        noteState[1] = noteStack.currentState[1];
     });
     document.getElementById("redoNote").addEventListener("click",function () {
         searchNoteState(noteStack.nextState);
+        noteState[0] = noteStack.currentState[0];
+        noteState[1] = noteStack.currentState[1];
     });
 
     /* prevent default behavior for ctrl+z */
-    window.addEventListener("keydown",function (event) {
-        preventCtrlZ(event,function () { noteStack.previousState });
-        // Update info //
-        document.getElementById("title").value = noteStack.currentState[0];
-        document.getElementById("content").value = noteStack.currentState[1];
-    });
+    // window.addEventListener("keydown",function (event) {
+    //     preventCtrlZ(event,function () { noteStack.previousState });
+    //     // Update info //
+    //     if (document.getElementById("title")) document.getElementById("title").value = noteStack.currentState[0];
+    //     if (document.getElementById("content")) document.getElementById("content").value = noteStack.currentState[1];
+    // });
 
     /* prevent default behavior for Tab key */
     function changeDefaultTAB (inputTagID) {
@@ -125,14 +134,35 @@ export function notePage (noteName) {
         inputTag.addEventListener("keydown",function (event) {
             if (event.key == "Tab") { 
                 event.preventDefault();
-                document.getElementById("title").value = inputTag.value;
-                inputTag.value = inputTag.value + "        ";
+                inputTag.value = inputTag.value + "    ";
             }
         })
     };
 
     changeDefaultTAB("title");
     changeDefaultTAB("content");
-    document.getElementById("title").value =  "NOM"
+
+    window.addEventListener("keydown",function (event) {
+        if (event.key == "Control") {
+            event.preventDefault();
+            window.onkeydown = function (e) {
+                if (e.key == "z") {
+                    e.preventDefault();
+                    noteStack.previousState; // handler();
+                    // Update info //
+                    if (document.getElementById("title")) document.getElementById("title").value = noteStack.currentState[0];
+                    if (document.getElementById("content")) document.getElementById("content").value = noteStack.currentState[1];
+                    noteState[0] = noteStack.currentState[0];
+                    noteState[1] = noteStack.currentState[1];
+                }
+            };
+            window.onkeyup = function (e) {
+                if (e.key == "Control") {
+                    // Restore default behavior for keydown event
+                    window.onkeydown = null
+                }
+            }
+        }
+    });
 
 };
