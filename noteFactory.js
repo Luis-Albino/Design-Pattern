@@ -1,4 +1,4 @@
-import { repositorium } from "./repositorium.js";
+import { repository } from "./repository.js";
 
 ///////////////////////////////
 /// Simple Note Constructor ///
@@ -12,13 +12,13 @@ function SimpleNote (myNoteName,myInfo) {
         + date.getFullYear() + ", " 
         + ((date.getHours() < 10)?"0":"") + date.getHours() + ":" 
         + ((date.getMinutes() < 10)?"0":"") + date.getMinutes() + " hrs";
-    if (!repositorium[myNoteName]) {
+    if (!repository[myNoteName]) {
         // Assigns a creation date only to newly created notes
         this["creationDate"] = this["lastModified"];
     }
     else {
         // Uses the existing creation date
-        this["creationDate"] = repositorium[myNoteName]["creationDate"];
+        this["creationDate"] = repository[myNoteName]["creationDate"];
     };
     this["info"] = myInfo;
 };
