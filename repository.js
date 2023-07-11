@@ -1,12 +1,12 @@
-    export var repositorium;
+    export var repository;
     
     //////////////////////////////
-    //////// Repositorium ////////
+    //////// repository ////////
     //////////////////////////////
 
-    repositorium = (function () {
+    repository = (function () {
 
-        const repoName = "notes_repositorium";
+        const repoName = "notes_repository";
         // localStorage.clear();
 
         if (!localStorage.getItem(repoName)) {
@@ -31,10 +31,10 @@
     //////////////////////////////
 
     (function () {
-        const repoListName = "list_repositorium";
+        const repoListName = "list_repository";
 
         // Add Ordered List //
-        repositorium["list"] = (function (repo) {
+        repository["list"] = (function (repo) {
             let list;
             if (!localStorage.getItem(repoListName)) {
                 list = [];
@@ -51,7 +51,7 @@
 
             return list
 
-        })(repositorium);
+        })(repository);
 
         // Copy Repo method //
         function copyRepo (repo) {
@@ -74,58 +74,58 @@
         };
 
         // list Stack //
-        let listStack = new Stack([copyRepo(repositorium),copyList(repositorium["list"])]);
+        let listStack = new Stack([copyRepo(repository),copyList(repository["list"])]);
 
         // repoStack methods //
         function appendToListStack (arr) {
             listStack.appendState(arr);
         };
-        Object.getPrototypeOf(repositorium).searchRepoState = function (state) {
+        Object.getPrototypeOf(repository).searchRepoState = function (state) {
             let newStack = listStack[state];
             let newRepo = newStack[0];
             for (let el in newRepo) {
-                if (!repositorium[el]) {
-                    repositorium[el] = newRepo[el]
+                if (!repository[el]) {
+                    repository[el] = newRepo[el]
                 }
             };
-            for (let el in repositorium) {
-                if (repositorium.hasOwnProperty(el) && !newRepo[el]) {
-                    delete repositorium[el]
+            for (let el in repository) {
+                if (repository.hasOwnProperty(el) && !newRepo[el]) {
+                    delete repository[el]
                 }
             };
-            repositorium["list"] = newStack[1];
-            repositorium.storeAtRepo(repositorium);
+            repository["list"] = newStack[1];
+            repository.storeAtRepo(repository);
             updateList();
             return listStack
         };
 
         // updateList() at closure //
         function updateList() {
-            localStorage.setItem(repoListName,JSON.stringify({"list":repositorium["list"]}));
+            localStorage.setItem(repoListName,JSON.stringify({"list":repository["list"]}));
         };
 
         // Add functionality: storeAtList() //
-        Object.getPrototypeOf(repositorium).storeAtList = function (noteName) {
-            let newRepoList = copyList(repositorium["list"]);
+        Object.getPrototypeOf(repository).storeAtList = function (noteName) {
+            let newRepoList = copyList(repository["list"]);
             newRepoList.push(noteName);
-            appendToListStack([copyRepo(repositorium),newRepoList]);
-            repositorium["list"] = newRepoList;
+            appendToListStack([copyRepo(repository),newRepoList]);
+            repository["list"] = newRepoList;
             updateList();
         };
 
-        Object.getPrototypeOf(repositorium).removeFromList = function (noteName) {
-            let i = repositorium["list"].indexOf(noteName);
-            let newRepoList = copyList(repositorium["list"]);
+        Object.getPrototypeOf(repository).removeFromList = function (noteName) {
+            let i = repository["list"].indexOf(noteName);
+            let newRepoList = copyList(repository["list"]);
             newRepoList.splice(i,1);
-            appendToListStack([copyRepo(repositorium),newRepoList]);
-            repositorium["list"] = newRepoList;
+            appendToListStack([copyRepo(repository),newRepoList]);
+            repository["list"] = newRepoList;
             updateList();
         };
 
-        Object.getPrototypeOf(repositorium).moveListElement = function (elementName,jumps) {
+        Object.getPrototypeOf(repository).moveListElement = function (elementName,jumps) {
             let newRepoList;
-            if (!!jumps) {
-                newRepoList = copyList(repositorium["list"]);
+            if (jumps) {
+                newRepoList = copyList(repository["list"]);
                 let i = newRepoList.indexOf(elementName);
                 let j = i + jumps;
                 j = (j < 0)?0:j;
@@ -137,20 +137,20 @@
                     i += increment;
                 };
                 newRepoList[j] = elementName;
+                appendToListStack([copyRepo(repository),newRepoList]);
+                repository["list"] = newRepoList;
+                updateList();
             };
-            appendToListStack([copyRepo(repositorium),newRepoList]);
-            repositorium["list"] = newRepoList;
-            updateList();
         };
 
         // Add functionality: displayList() //
-        Object.getPrototypeOf(repositorium).displayList = function (list,node,noMatches = false) {
+        Object.getPrototypeOf(repository).displayList = function (list,node,noMatches = false) {
             // Delete current list //
             while (node.children[0]) {
                 node.children[0].remove();
             };
 
-            if (list.length > 0) {
+            if (list.length && list.length > 0) {
                 // Display new list //
                 for (let note in list) {
                     let div = document.createElement("DIV");
@@ -165,7 +165,7 @@
             else {
                 let div = document.createElement("DIV");
                 div.className = "notification";
-                div.innerHTML = noMatches?"No matches":"Empty repositorium";
+                div.innerHTML = noMatches?"No matches":"Empty repository";
                 node.appendChild(div);
             };
         };
